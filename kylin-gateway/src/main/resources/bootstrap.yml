@@ -1,0 +1,11 @@
+spring:
+  cloud:
+    nacos:
+      config:
+        server-addr: 47.104.250.79:8848
+        prefix: getway
+        file-extension: yml
+  profiles:
+    active: dev
+  redis:
+    host: 49.233.68.33

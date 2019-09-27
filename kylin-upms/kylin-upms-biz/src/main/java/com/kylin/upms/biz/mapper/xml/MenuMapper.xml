@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kylin.upms.biz.mapper.MenuMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.kylin.upms.biz.entity.Menu">
+        <id column="id" property="id" />
+        <result column="url" property="url" />
+        <result column="path" property="path" />
+        <result column="component" property="component" />
+        <result column="name" property="name" />
+        <result column="iconCls" property="iconCls" />
+        <result column="keepAlive" property="keepAlive" />
+        <result column="requireAuth" property="requireAuth" />
+        <result column="parentId" property="parentId" />
+        <result column="enabled" property="enabled" />
+        <result column="create_time" property="createTime" />
+        <collection property="roleList" ofType="com.kylin.upms.biz.entity.Role">
+            <id column="id1" property="id" />
+            <result column="name1" property="name" />
+        </collection>
+        <collection property="menuList" ofType="com.kylin.upms.biz.entity.Menu">
+            <id column="id1" property="id" />
+            <result column="name1" property="name" />
+            <result column="url1" property="url" />
+            <result column="path1" property="path" />
+            <result column="component1" property="component" />
+            <result column="name1" property="name" />
+            <result column="parentId1" property="parentId" />
+        </collection>
+
+    </resultMap>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, url, path, component, name, iconCls AS iconCls, keepAlive AS keepAlive, requireAuth AS requireAuth, parentId AS parentId, enabled, create_time
+    </sql>
+
+    <select id="getMenuAll" resultMap="BaseResultMap">
+        SELECT
+            m.*,
+          r.id as id1,
+            r.`name` as name1
+        FROM
+            menu m
+        LEFT JOIN menu_role mr ON mr.mid = m.id
+        LEFT JOIN role r ON mr.rid = r.id
+    </select>
+
+
+    <select id="getMenuBuUserID" resultMap="BaseResultMap" parameterType="java.lang.String">
+
+        SELECT
+	men1.*,
+	menu2.id as id1,
+	menu2.url as url1,
+	menu2.name as name1,
+	menu2.parentid as parentid1,
+	menu2.path as path1,
+	menu2.component as component1
+FROM
+	menu men1,
+	menu menu2
+WHERE
+	men1.id = menu2.parentId
+AND menu2.id IN (
+	SELECT
+		mr.mid
+	FROM
+		menu_role mr,
+		user_role ur,
+		user u
+	WHERE
+		mr.rid = ur.rid
+	AND ur.uid = u.id
+	AND u.username = #{username}
+)
+and men1.parentid =1
+and  men1.enabled =1
+    </select>
+
+    <!--为了树-->
+    <select id="getAllMenu" resultMap="BaseResultMap">
+              SELECT menu1.*,menu2.id as id1,
+	menu2.url as url1,
+	menu2.name as name1,
+	menu2.parentid as parentid1,
+	menu2.path as path1,
+	menu2.component as component1 FROM menu as menu1,menu as menu2 WHERE menu1.id=menu2.parentId AND menu2.id IN
+(SELECT mr.mid FROM menu_role mr,user_role ur,role r
+  WHERE mr.rid=ur.rid and ur.rid= r.id )
+AND menu1.parentId=1 AND menu2.enabled=1
+    </select>
+</mapper>

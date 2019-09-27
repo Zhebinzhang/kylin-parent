@@ -1,0 +1,12 @@
+#server:
+##  port: 11000
+##spring:
+##  aop:
+##    auto: true #启动aop配置
+##  application:
+##    name: aop
+##  data:
+##    mongodb:
+##      uri: mongodb://49.233.68.33:27017/mongo
+##  rabbitmq:
+##    host: 49.233.68.33
